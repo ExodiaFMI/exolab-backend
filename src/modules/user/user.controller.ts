@@ -1,9 +1,12 @@
-import { JsonController, Get, Post, Delete, Param, Body } from 'routing-controllers';
+import { JsonController, Get, Post, Delete, Param, Body, UseBefore } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { UserService } from './user.service';
 import { CreateUserDto, UserResponseDto } from './user.dto';
+import { authMiddleware, adminMiddleware } from '../../middlewares/auth';
+
 
 @JsonController('/users')
+@UseBefore(authMiddleware)
 @OpenAPI({ tags: ['Users'] })
 export class UserController {
   private userService = UserService.getInstance();
@@ -57,6 +60,7 @@ export class UserController {
   }
 
   @Delete('/:id')
+  @UseBefore(adminMiddleware)
   @OpenAPI({
     summary: 'Delete a user by ID',
     responses: {

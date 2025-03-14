@@ -1,21 +1,29 @@
-import jwt, { SignOptions } from 'jsonwebtoken';
+import { UserRepository } from '../user/user.repository';
+import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { LoginDto } from './auth.dto';
 
 dotenv.config();
 
-const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET as string;
-const JWT_EXPIRES_IN: number = parseInt(process.env.JWT_EXPIRES_IN ?? '3600', 10);
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export class AuthService {
-    static generateToken(userId: string): string {
-        return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as SignOptions);
+  private userRepo = UserRepository.getInstance();
+
+  async login(loginDto: LoginDto) {
+    const user = await this.userRepo.findByEmail(loginDto.email);
+    if (!user) {
+      throw new Error('Invalid credentials');
     }
 
-    static verifyToken(token: string): { userId: string } | null {
-        try {
-            return jwt.verify(token, JWT_SECRET) as { userId: string };
-        } catch {
-            return null;
-        }
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Invalid credentials');
     }
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+
+    return { token };
+  }
 }

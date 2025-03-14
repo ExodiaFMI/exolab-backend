@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import { useExpressServer } from 'routing-controllers';
 import { setupSwagger } from './config/swagger';
 import { UserController } from './modules/user/user.controller';
+import { AuthController } from './modules/auth/auth.controller';
+
 
 dotenv.config();
 
@@ -15,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 useExpressServer(app, {
-  controllers: [UserController],
+  controllers: [UserController, AuthController],
 });
 
 app.get('/', (req, res) => {
