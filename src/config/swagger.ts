@@ -32,9 +32,9 @@ export function setupSwagger(app: Express) {
       version: '1.0.0',
       description: 'Documentation for the ExoLab API',
     },
-    servers: [{ url: 'http://localhost:3000/api' }],
+    servers: [{ url: 'http://localhost:3000' }],
   });
 
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(spec));
-  console.log('📄 Swagger: http://localhost:3000/api/docs');
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(spec));
+  console.log('📄 Swagger: http://localhost:3000/docs');
 }
