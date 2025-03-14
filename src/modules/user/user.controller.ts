@@ -6,12 +6,12 @@ import { authMiddleware, adminMiddleware } from '../../middlewares/auth';
 
 
 @JsonController('/users')
-@UseBefore(authMiddleware)
 @OpenAPI({ tags: ['Users'] })
 export class UserController {
   private userService = UserService.getInstance();
 
   @Get('/')
+  @UseBefore(authMiddleware)
   @OpenAPI({
     summary: 'Retrieve all users',
     responses: {
@@ -27,6 +27,7 @@ export class UserController {
   }
 
   @Get('/:id')
+  @UseBefore(authMiddleware)
   @OpenAPI({
     summary: 'Retrieve a user by ID',
     responses: {
@@ -60,6 +61,7 @@ export class UserController {
   }
 
   @Delete('/:id')
+  @UseBefore(authMiddleware)
   @UseBefore(adminMiddleware)
   @OpenAPI({
     summary: 'Delete a user by ID',
