@@ -1,57 +1,34 @@
-import { Request, Response, NextFunction } from 'express';
+import { JsonController, Get, Post, Delete, Param, Body } from 'routing-controllers';
+import { OpenAPI } from 'routing-controllers-openapi';
 import { UserService } from './user.service';
+import { User } from './user.entity';
 
+@JsonController('/users')
+@OpenAPI({ tags: ['Users'] })
 export class UserController {
-  private userService: UserService;
+  private userService = UserService.getInstance();
 
-  constructor(userService: UserService) {
-    this.userService = userService;
+  @Get('/')
+  @OpenAPI({ summary: 'Retrieves all users' })
+  getAllUsers(): Promise<User[]> {
+    return this.userService.getAllUsers();
   }
 
-  async getAllUsers(req: Request, res: Response) {
-    const users = await this.userService.getAllUsers();
-    res.json(users);
+  @Get('/:id')
+  @OpenAPI({ summary: 'Retrieves a user by ID' })
+  getUserById(@Param('id') id: number): Promise<User | null> {
+    return this.userService.getUserById(id);
   }
 
-  async getUserById(req: Request, res: Response): Promise<void> {
-    try {
-      const id = Number(req.params.id);
-      if (isNaN(id)) {
-        res.status(400).json({ message: 'Invalid user ID' });
-        return;
-      }
-
-      const user = await this.userService.getUserById(id);
-      if (!user) {
-        res.status(404).json({ message: 'User not found' });
-        return;
-      }
-
-      res.json(user);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
+  @Post('/')
+  @OpenAPI({ summary: 'Creates a new user' })
+  createUser(@Body() userData: Partial<User>): Promise<User> {
+    return this.userService.registerUser(userData);
   }
 
-  async createUser(req: Request, res: Response) {
-    const userData = req.body;
-    const newUser = await this.userService.registerUser(userData);
-    res.status(201).json(newUser);
-  }
-
-  async deleteUser(req: Request, res: Response) {
-    try {
-      const id = Number(req.params.id);
-      if (isNaN(id)) {
-        res.status(400).json({ message: 'Invalid user ID' });
-        return;
-      }
-
-      await this.userService.deleteUser(id);
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
-    }
+  @Delete('/:id')
+  @OpenAPI({ summary: 'Deletes a user by ID' })
+  deleteUser(@Param('id') id: number): Promise<void> {
+    return this.userService.deleteUser(id);
   }
 }

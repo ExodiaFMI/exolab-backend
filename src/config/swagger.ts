@@ -1,23 +1,19 @@
-import swaggerJsdoc from 'swagger-jsdoc';
+import { getMetadataArgsStorage } from 'routing-controllers';
+import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
 
-const options: swaggerJsdoc.Options = {
-  definition: {
-    openapi: '3.0.0',
+export function setupSwagger(app: Express) {
+  const storage = getMetadataArgsStorage();
+  const spec = routingControllersToSpec(storage, {}, {
     info: {
       title: 'ExoLab API',
       version: '1.0.0',
-      description: 'Documentation for ExoLab API',
+      description: 'Documentation for the ExoLab API',
     },
     servers: [{ url: 'http://localhost:3000/api' }],
-  },
-  apis: ['./src/modules/**/*.routes.ts'],
-};
+  });
 
-const swaggerSpec = swaggerJsdoc(options);
-
-export function setupSwagger(app: Express) {
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(spec));
   console.log('📄 Swagger: http://localhost:3000/api/docs');
 }
