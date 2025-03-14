@@ -1,13 +1,34 @@
-import { CourseRepository } from "./course.repository";
-import { Course } from "./course.entity";
+import { CourseRepository } from './course.repository';
+import { Course } from './course.entity';
 
 export class CourseService {
-    async getAllCourses(): Promise<Course[]> {
-        return CourseRepository.find({ relations: ["subject"] });
-    }
+  private static instance: CourseService;
+  private courseRepo: CourseRepository;
 
-    async createCourse(courseData: Partial<Course>): Promise<Course> {
-        const course = CourseRepository.create(courseData);
-        return CourseRepository.save(course);
+  private constructor(courseRepo: CourseRepository) {
+    this.courseRepo = courseRepo;
+  }
+
+  static getInstance(): CourseService {
+    if (!CourseService.instance) {
+      CourseService.instance = new CourseService(CourseRepository.getInstance());
     }
+    return CourseService.instance;
+  }
+
+  async getAllCourses(): Promise<Course[]> {
+    return this.courseRepo.findAll();
+  }
+
+  async getCourseById(id: number): Promise<Course | null> {
+    return this.courseRepo.findById(id);
+  }
+
+  async createCourse(courseData: Partial<Course>): Promise<Course> {
+    return this.courseRepo.createCourse(courseData);
+  }
+
+  async deleteCourse(id: number): Promise<void> {
+    await this.courseRepo.deleteCourse(id);
+  }
 }

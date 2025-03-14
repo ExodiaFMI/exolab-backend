@@ -1,18 +1,35 @@
-import { JsonController, Get, Post, Body } from "routing-controllers";
-import { CourseService } from "./course.service";
-import { Course } from "./course.entity";
+import { JsonController, Get, Post, Delete, Param, Body, UseBefore } from 'routing-controllers';
+import { OpenAPI } from 'routing-controllers-openapi';
+import { CourseService } from './course.service';
+import { authMiddleware, adminMiddleware } from '../../middlewares/auth';
+import { Course } from './course.entity';
 
-@JsonController("/courses")
+@JsonController('/courses')
+@OpenAPI({ tags: ['Courses'] })
 export class CourseController {
-    private courseService = new CourseService();
+  private courseService = CourseService.getInstance();
 
-    @Get("/")
-    async getAllCourses(): Promise<Course[]> {
-        return this.courseService.getAllCourses();
-    }
+  @Get('/')
+  @UseBefore(authMiddleware)
+  async getAllCourses() {
+    return this.courseService.getAllCourses();
+  }
 
-    @Post("/")
-    async createCourse(@Body() courseData: Partial<Course>): Promise<Course> {
-        return this.courseService.createCourse(courseData);
-    }
+  @Get('/:id')
+  @UseBefore(authMiddleware)
+  async getCourseById(@Param('id') id: number) {
+    return this.courseService.getCourseById(id);
+  }
+
+  @Post('/')
+  @UseBefore(authMiddleware)
+  async createCourse(@Body() courseData: Partial<Course>) {
+    return this.courseService.createCourse(courseData);
+  }
+
+  @Delete('/:id')
+  @UseBefore(authMiddleware, adminMiddleware)
+  async deleteCourse(@Param('id') id: number) {
+    return this.courseService.deleteCourse(id);
+  }
 }
