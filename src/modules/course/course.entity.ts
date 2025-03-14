@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Subject } from "../subject/subject.entity";
-
+import { Language } from "../../enums/language.enum";
 @Entity("courses")
 export class Course {
     @PrimaryGeneratedColumn()
@@ -18,10 +18,14 @@ export class Course {
     @ManyToOne(() => Subject)
     subject: Subject;
 
-    constructor(name: string, description: string, testInfo: string, subject: Subject) {
+    @Column({ type: "enum", enum: Language })
+    language: Language;
+
+    constructor(name: string, description: string, testInfo: string, subject: Subject, language: Language) {
         this.name = name;
         this.description = description;
         this.testInfo = testInfo;
         this.subject = subject;
+        this.language = language;
     }
 }
