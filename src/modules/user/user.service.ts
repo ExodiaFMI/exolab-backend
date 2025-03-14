@@ -1,5 +1,6 @@
 import { UserRepository } from './user.repository';
 import { User } from './user.entity';
+import * as bcrypt from 'bcrypt';
 
 export class UserService {
   private static instance: UserService;
@@ -25,6 +26,10 @@ export class UserService {
   }
 
   async registerUser(userData: Partial<User>): Promise<User> {
+    if (userData.password) {
+      const saltRounds = 10;
+      userData.password = await bcrypt.hash(userData.password, saltRounds);
+    }
     return this.userRepo.createUser(userData);
   }
 
