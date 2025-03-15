@@ -33,6 +33,11 @@ export const AppDataSource = new DataSource({
   logging: false,
   entities: ['src/modules/**/*.entity.ts'],
   migrations: ['src/migrations/*.ts'],
+  extra: {
+    max: 5,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 20000
+},
 });
 
 export default AppDataSource;
