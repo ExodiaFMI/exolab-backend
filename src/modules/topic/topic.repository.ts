@@ -25,6 +25,13 @@ export class TopicRepository {
     return this.repo.findOne({ where: { id }, relations: ['course'] });
   }
 
+  async findByCourseId(courseId: number): Promise<Topic[]> {
+    return this.repo.find({
+      where: { course: { id: courseId } },
+      relations: ['course']
+    });
+  }
+
   async createTopic(topicData: Partial<Topic>): Promise<Topic> {
     const topic = this.repo.create(topicData);
     return this.repo.save(topic);

@@ -1,6 +1,8 @@
 import { TopicRepository } from './topic.repository';
 import { Topic } from './topic.entity';
 import { Course } from '../course/course.entity';
+import { CourseService } from '../course/course.service';
+import { User } from '../user/user.entity';
 import axios from 'axios';
 
 export class TopicService {
@@ -37,5 +39,24 @@ export class TopicService {
       console.error('Error generating topics:', error);
       throw new Error('Failed to generate topics for course');
     }
+  }
+
+
+  async getTopicsByCourseId(courseId: number): Promise<Topic[]> {
+    return this.topicRepo.findByCourseId(courseId);
+  }
+
+  async getTopicsForCourseIfOwner(courseId: number, user: User): Promise<Topic[]> {
+    const course = await CourseService.getInstance().getCourseById(courseId);
+
+    if (!course) {
+      throw new Error(`Course with ID ${courseId} not found`);
+    }
+
+    if (course.owner.id !== user.id) {
+      throw new Error('You are not the owner of this course');
+    }
+
+    return this.topicRepo.findByCourseId(courseId);
   }
 }

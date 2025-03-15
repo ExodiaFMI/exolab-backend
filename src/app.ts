@@ -7,6 +7,7 @@ import { setupSwagger } from './config/swagger';
 import { UserController } from './modules/user/user.controller';
 import { AuthController } from './modules/auth/auth.controller';
 import { CourseController } from './modules/course/course.controller';
+import { TopicController } from './modules/topic/topic.controller';
 
 
 dotenv.config();
@@ -18,7 +19,12 @@ app.use(cors());
 app.use(express.json());
 
 useExpressServer(app, {
-  controllers: [UserController, AuthController, CourseController],
+  controllers: [
+    UserController,
+    AuthController,
+    CourseController,
+    TopicController
+  ],
 });
 
 app.get('/', (req, res) => {
