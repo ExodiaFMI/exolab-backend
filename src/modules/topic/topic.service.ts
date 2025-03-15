@@ -9,21 +9,32 @@ import axios from 'axios';
 export class TopicService {
   private static instance: TopicService;
   private topicRepo: TopicRepository;
-  private subtopicService: SubtopicService;
+  private subtopicService?: SubtopicService;
+  private courseService?: CourseService;
 
-  private constructor(topicRepo: TopicRepository, subtopicService: SubtopicService) {
+  private constructor(topicRepo: TopicRepository) {
     this.topicRepo = topicRepo;
-    this.subtopicService = subtopicService;
   }
 
   static getInstance(): TopicService {
     if (!TopicService.instance) {
-      TopicService.instance = new TopicService(
-        TopicRepository.getInstance(),
-        SubtopicService.getInstance()
-      );
+      TopicService.instance = new TopicService(TopicRepository.getInstance());
     }
     return TopicService.instance;
+  }
+
+  private getSubtopicService(): SubtopicService {
+    if (!this.subtopicService) {
+      this.subtopicService = SubtopicService.getInstance();
+    }
+    return this.subtopicService;
+  }
+
+  private getCourseService(): CourseService {
+    if (!this.courseService) {
+      this.courseService = CourseService.getInstance();
+    }
+    return this.courseService;
   }
 
   async generateTopicsForCourse(course: Course): Promise<void> {
@@ -42,21 +53,19 @@ export class TopicService {
 
       const savedTopics = await Promise.all(topics);
 
-      // 🔹 Генерираме Subtopics след като Topics са създадени
-      await this.subtopicService.generateSubtopicsForTopics(savedTopics);
+      await this.getSubtopicService().generateSubtopicsForTopics(savedTopics);
     } catch (error) {
       console.error("Error generating topics:", error);
       throw new Error("Failed to generate topics for course");
     }
   }
 
-
   async getTopicsByCourseId(courseId: number): Promise<Topic[]> {
     return this.topicRepo.findByCourseId(courseId);
   }
 
   async getTopicsForCourseIfOwner(courseId: number, user: User): Promise<Topic[]> {
-    const course = await CourseService.getInstance().getCourseById(courseId);
+    const course = await this.getCourseService().getCourseById(courseId);
 
     if (!course) {
       throw new Error(`Course with ID ${courseId} not found`);

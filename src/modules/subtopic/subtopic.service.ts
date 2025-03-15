@@ -9,21 +9,32 @@ import axios from "axios";
 export class SubtopicService {
   private static instance: SubtopicService;
   private subtopicRepo: SubtopicRepository;
-  private topicService: TopicService;
+  private topicService?: TopicService;
+  private courseService?: CourseService;
 
-  private constructor(subtopicRepo: SubtopicRepository, topicService: TopicService) {
+  private constructor(subtopicRepo: SubtopicRepository) {
     this.subtopicRepo = subtopicRepo;
-    this.topicService = topicService;
   }
 
   static getInstance(): SubtopicService {
     if (!SubtopicService.instance) {
-      SubtopicService.instance = new SubtopicService(
-        SubtopicRepository.getInstance(),
-        TopicService.getInstance()
-      );
+      SubtopicService.instance = new SubtopicService(SubtopicRepository.getInstance());
     }
     return SubtopicService.instance;
+  }
+
+  private getTopicService(): TopicService {
+    if (!this.topicService) {
+      this.topicService = TopicService.getInstance();
+    }
+    return this.topicService;
+  }
+
+  private getCourseService(): CourseService {
+    if (!this.courseService) {
+      this.courseService = CourseService.getInstance();
+    }
+    return this.courseService;
   }
 
   async generateSubtopicsForTopics(topics: Topic[]): Promise<void> {
@@ -139,7 +150,7 @@ export class SubtopicService {
   }
 
   async getSubtopicsByTopicAndCourseIfOwner(topicId: number, courseId: number, user: User) {
-    const course = await CourseService.getInstance().getCourseById(courseId);
+    const course = await this.getCourseService().getCourseById(courseId);
 
     if (!course) {
       throw new Error(`Course with ID ${courseId} not found`);
