@@ -92,7 +92,22 @@ export function setupSwagger(app: Express) {
               }
             }
           }
+        },
+        TopicResponseDto: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            name: { type: 'string' },
+            course: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' }
+              }
+            }
+          }
         }
+        
       }
     },
     info: {
