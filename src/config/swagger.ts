@@ -70,6 +70,21 @@ export function setupSwagger(app: Express) {
             password: { type: 'string', minLength: 6 }
           },
           required: ['email', 'password']
+        },
+        SubtopicResponseDto: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            name: { type: 'string' },
+            text: { type: 'string' },
+            topic: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' }
+              }
+            }
+          }
         }
       }
     },
