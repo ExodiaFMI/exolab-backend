@@ -201,4 +201,47 @@ export class AgentController {
   async searchImage(@Body() body: { prompt: string }) {
     return this.agentService.searchImage(body.prompt);
   }
+
+  @Post("/video/generate")
+  @OpenAPI({
+    summary: "Generate a video",
+    description: "Generates a video based on the given prompt.",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              prompt: { type: "string" },
+              model: { type: "string", default: "ray-2" },
+              resolution: { type: "string", default: "720p" },
+              duration: { type: "string", default: "5s" },
+              loop: { type: "boolean", default: false }
+            },
+            required: ["prompt"]
+          }
+        }
+      }
+    },
+    responses: {
+      "200": {
+        description: "Generated video",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                video_url: { type: "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  async generateVideo(
+    @Body() body: { prompt: string; model?: string; resolution?: string; duration?: string; loop?: boolean }
+  ) {
+    return this.agentService.generateVideo(body.prompt, body.model, body.resolution, body.duration, body.loop);
+  }
 }

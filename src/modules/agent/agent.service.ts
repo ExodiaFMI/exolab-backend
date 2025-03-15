@@ -57,11 +57,27 @@ class AgentService {
 
   async searchImage(prompt: string): Promise<{ image_url: string }> {
     try {
-      const response = await axios.post(`${this.baseUrl}/image/search`, { prompt });
+      const response = await axios.post(`${this.baseUrl}/images/search`, { prompt });
       return response.data;
     } catch (error) {
       console.error("Error searching image:", error);
       throw new Error("Failed to search image");
+    }
+  }
+
+  async generateVideo(
+    prompt: string,
+    model: string = "ray-2",
+    resolution: string = "720p",
+    duration: string = "5s",
+    loop: boolean = false
+  ): Promise<{ video_url: string }> {
+    try {
+      const response = await axios.post(`${this.baseUrl}/videos/generate`, { prompt, model, resolution, duration, loop });
+      return response.data;
+    } catch (error) {
+      console.error("Error generating video:", error);
+      throw new Error("Failed to generate video");
     }
   }
 }
