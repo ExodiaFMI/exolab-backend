@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { Subject } from './subject.entity';
 import AppDataSource from '../../config/database';
+import { SubjectName } from "../../enums/subject.enum";
 
 export class SubjectRepository {
   private static instance: SubjectRepository;
@@ -26,8 +27,8 @@ export class SubjectRepository {
   }
 
   async findByName(name: string): Promise<Subject | null> {
-    return this.repo.findOne({ where: { name } });
-  }
+    return this.repo.findOne({ where: { name: name as SubjectName } });
+}
 
   async createSubject(subjectData: Partial<Subject>): Promise<Subject> {
     const subject = this.repo.create(subjectData);

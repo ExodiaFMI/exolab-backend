@@ -1,17 +1,28 @@
 import { CourseRepository } from './course.repository';
 import { Course } from './course.entity';
+import { CreateCourseDto } from './course.dto';
+import { UserService } from '../user/user.service';
+import { SubjectRepository } from '../subject/subject.repository';
 
 export class CourseService {
   private static instance: CourseService;
   private courseRepo: CourseRepository;
+  private userService: UserService;
+  private subjectRepo: SubjectRepository;
 
-  private constructor(courseRepo: CourseRepository) {
+  private constructor(courseRepo: CourseRepository, userService: UserService, subjectRepo: SubjectRepository) {
     this.courseRepo = courseRepo;
+    this.userService = userService;
+    this.subjectRepo = subjectRepo;
   }
 
   static getInstance(): CourseService {
     if (!CourseService.instance) {
-      CourseService.instance = new CourseService(CourseRepository.getInstance());
+      CourseService.instance = new CourseService(
+        CourseRepository.getInstance(),
+        UserService.getInstance(),
+        SubjectRepository.getInstance()
+      );
     }
     return CourseService.instance;
   }
@@ -28,8 +39,24 @@ export class CourseService {
     return this.courseRepo.findByUserId(userId);
   }
 
-  async createCourse(courseData: Partial<Course>): Promise<Course> {
-    return this.courseRepo.createCourse(courseData);
+  async createCourse(courseData: CreateCourseDto): Promise<Course> {
+    const subject = await this.subjectRepo.findById(courseData.subjectId);
+    if (!subject) {
+        throw new Error(`Subject with ID ${courseData.subjectId} not found`);
+    }
+
+    const owner = await this.userService.getUserById(courseData.ownerId);
+    if (!owner) {
+        throw new Error(`User with ID ${courseData.ownerId} not found`);
+    }
+
+    const newCourse = await this.courseRepo.createCourse({
+        ...courseData,
+        subject,
+        owner
+    });
+
+    return newCourse;
   }
 
   async deleteCourse(id: number): Promise<void> {
