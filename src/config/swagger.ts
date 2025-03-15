@@ -3,12 +3,17 @@ import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
 import fs from 'fs';
+import { Language } from '../enums/language.enum';
 
 export function setupSwagger(app: Express) {
   const storage = getMetadataArgsStorage();
   const spec = routingControllersToSpec(storage, {}, {
     components: {
       schemas: {
+        LanguagesEnum: {
+          type: 'string',
+          enum: Object.values(Language),
+        },
         CreateUserDto: {
           type: 'object',
           properties: {
@@ -33,7 +38,7 @@ export function setupSwagger(app: Express) {
             description: { type: 'string', minLength: 10 },
             testInfo: { type: 'string', minLength: 5 },
             subjectId: { type: 'number' },
-            language: { type: 'string', enum: ['English', 'Bulgarian', 'Spanish', 'French', 'German'] },
+            language: {  $ref: '#/components/schemas/LanguagesEnum' },
             ownerId: { type: 'number' }
           },
           required: ['name', 'description', 'testInfo', 'subjectId', 'language', 'ownerId']
