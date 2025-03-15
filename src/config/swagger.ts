@@ -24,6 +24,51 @@ export function setupSwagger(app: Express) {
             name: { type: 'string' },
             email: { type: 'string' }
           }
+        },
+        CreateCourseDto: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', minLength: 3 },
+            description: { type: 'string', minLength: 10 },
+            testInfo: { type: 'string', minLength: 5 },
+            subjectId: { type: 'number' },
+            language: { type: 'string', enum: ['English', 'Bulgarian', 'Spanish', 'French', 'German'] },
+            ownerId: { type: 'number' }
+          },
+          required: ['name', 'description', 'testInfo', 'subjectId', 'language', 'ownerId']
+        },
+        CourseResponseDto: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            testInfo: { type: 'string' },
+            language: { type: 'string' },
+            subject: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' }
+              }
+            },
+            owner: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' },
+                email: { type: 'string' }
+              }
+            }
+          }
+        },
+        LoginDto: {
+          type: 'object',
+          properties: {
+            email: { type: 'string', format: 'email' },
+            password: { type: 'string', minLength: 6 }
+          },
+          required: ['email', 'password']
         }
       }
     },
