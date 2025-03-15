@@ -34,6 +34,16 @@ class AgentService {
       throw new Error("Failed to send message");
     }
   }
+
+  async getChatHistory(sessionId: string): Promise<{ session_id: string; history: { role: string; content: string }[] }> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/messages`, { params: { session_id: sessionId } });
+      return response.data;
+    } catch (error) {
+      console.error("Error retrieving chat history:", error);
+      throw new Error("Failed to retrieve chat history");
+    }
+  }
 }
 
 export default AgentService.getInstance();

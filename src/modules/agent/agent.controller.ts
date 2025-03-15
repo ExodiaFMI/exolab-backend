@@ -1,4 +1,4 @@
-import { JsonController, Post, Body } from "routing-controllers";
+import { JsonController, Post, Get, Body, QueryParam } from "routing-controllers";
 import { OpenAPI } from "routing-controllers-openapi";
 import AgentService from "./agent.service";
 
@@ -84,5 +84,47 @@ export class AgentController {
   })
   async sendMessage(@Body() body: { session_id: string; message: string }) {
     return this.agentService.sendMessage(body.session_id, body.message);
+  }
+
+  @Get("/chat/messages")
+  @OpenAPI({
+    summary: "Get chat history",
+    description: "Retrieves the full history of a chat session.",
+    parameters: [
+      {
+        name: "session_id",
+        in: "query",
+        required: true,
+        schema: { type: "string" }
+      }
+    ],
+    responses: {
+      "200": {
+        description: "Chat history retrieved",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                session_id: { type: "string" },
+                history: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      role: { type: "string" },
+                      content: { type: "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  async getChatHistory(@QueryParam("session_id") sessionId: string) {
+    return this.agentService.getChatHistory(sessionId);
   }
 }
