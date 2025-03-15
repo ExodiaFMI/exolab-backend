@@ -71,19 +71,11 @@ export function setupSwagger(app: Express) {
           },
           required: ['email', 'password']
         },
-        SubtopicResponseDto: {
+        SubjectResponseDto: {
           type: 'object',
           properties: {
             id: { type: 'number' },
-            name: { type: 'string' },
-            text: { type: 'string' },
-            topic: {
-              type: 'object',
-              properties: {
-                id: { type: 'number' },
-                name: { type: 'string' }
-              }
-            }
+            name: { type: 'string' }
           }
         }
       }
