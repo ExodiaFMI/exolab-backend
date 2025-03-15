@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
 import fs from 'fs';
 import { Language } from '../enums/language.enum';
+import { ResourceType } from '../enums/resource.enum';
 
 export function setupSwagger(app: Express) {
   const storage = getMetadataArgsStorage();
@@ -38,7 +39,7 @@ export function setupSwagger(app: Express) {
             description: { type: 'string', minLength: 10 },
             testInfo: { type: 'string', minLength: 5 },
             subjectId: { type: 'number' },
-            language: {  $ref: '#/components/schemas/LanguagesEnum' },
+            language: { $ref: '#/components/schemas/LanguagesEnum' },
             ownerId: { type: 'number' }
           },
           required: ['name', 'description', 'testInfo', 'subjectId', 'language', 'ownerId']
@@ -117,10 +118,7 @@ export function setupSwagger(app: Express) {
           properties: {
             id: { type: 'number' },
             source_url: { type: 'string', format: 'uri' },
-            type: { 
-              type: 'string', 
-              enum: ['VIDEO', 'ARTICLE', 'BOOK', 'DOCUMENT', 'OTHER']
-            },
+            type: { $ref: '#/components/schemas/ResourceTypeEnum' },
             subtopic: {
               type: 'object',
               properties: {
@@ -129,9 +127,11 @@ export function setupSwagger(app: Express) {
               }
             }
           }
-        }
-        
-        
+        },
+        ResourceTypeEnum: {
+          type: 'string',
+          enum: Object.values(ResourceType),
+        },
       }
     },
     info: {
