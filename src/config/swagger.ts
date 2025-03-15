@@ -2,6 +2,7 @@ import { getMetadataArgsStorage } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
+import fs from 'fs';
 
 export function setupSwagger(app: Express) {
   const storage = getMetadataArgsStorage();
@@ -79,6 +80,9 @@ export function setupSwagger(app: Express) {
     },
     servers: [{ url: 'http://localhost:3000' }],
   });
+
+  fs.mkdirSync('./openapi', { recursive: true });
+  fs.writeFileSync('./openapi/swagger.json', JSON.stringify(spec, null, 2), 'utf-8');;
 
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(spec));
   console.log('📄 Swagger: http://localhost:3000/docs');
