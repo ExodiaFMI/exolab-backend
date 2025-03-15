@@ -10,6 +10,7 @@ import { CourseController } from './modules/course/course.controller';
 import { TopicController } from './modules/topic/topic.controller';
 import { SubtopicController } from './modules/subtopic/subtopic.controller';
 import { SubjectController } from './modules/subject/subject.controller';
+import { AgentController } from './modules/agent/agent.controller'; 
 
 
 dotenv.config();
@@ -27,7 +28,8 @@ useExpressServer(app, {
     CourseController,
     TopicController,
     SubtopicController,
-    SubjectController
+    SubjectController,
+    AgentController
   ],
 });
 
