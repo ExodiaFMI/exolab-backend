@@ -6,7 +6,7 @@ import AgentService from "./agent.service";
 @OpenAPI({ tags: ["Agent"] })
 export class AgentController {
   private agentService = AgentService;
-
+  
   @Post("/chat/start")
   @OpenAPI({
     summary: "Start a new chat session",
@@ -33,7 +33,23 @@ export class AgentController {
               type: "object",
               properties: {
                 session_id: { type: "string" },
-                reply: { type: "string" },
+                reply: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                    sources: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          link: { type: "string" },
+                          id: { type: "string" }
+                        }
+                      }
+                    }
+                  }
+                },
                 history: { type: "array", items: { type: "string" } }
               }
             }
@@ -73,7 +89,23 @@ export class AgentController {
               type: "object",
               properties: {
                 session_id: { type: "string" },
-                reply: { type: "string" },
+                reply: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                    sources: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          link: { type: "string" },
+                          id: { type: "string" }
+                        }
+                      }
+                    }
+                  }
+                },
                 history: { type: "array", items: { type: "string" } }
               }
             }
@@ -114,6 +146,23 @@ export class AgentController {
                     properties: {
                       role: { type: "string" },
                       content: { type: "string" }
+                    }
+                  }
+                },
+                reply: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                    sources: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          link: { type: "string" },
+                          id: { type: "string" }
+                        }
+                      }
                     }
                   }
                 }

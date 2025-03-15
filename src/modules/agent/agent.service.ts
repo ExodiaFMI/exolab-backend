@@ -15,7 +15,7 @@ class AgentService {
     return AgentService.instance;
   }
 
-  async startChat(message: string): Promise<{ session_id: string; reply: string; history: string[] }> {
+  async startChat(message: string): Promise<{ session_id: string; reply: string; history: string[]; source: string }> {
     try {
       const response = await axios.post(`${this.baseUrl}/chat/create`, { message });
       return response.data;
@@ -25,7 +25,7 @@ class AgentService {
     }
   }
 
-  async sendMessage(sessionId: string, message: string): Promise<{ session_id: string; reply: string; history: string[] }> {
+  async sendMessage(sessionId: string, message: string): Promise<{ session_id: string; reply: string; history: string[]; source: string }> {
     try {
       const response = await axios.post(`${this.baseUrl}/chat/message`, { session_id: sessionId, message });
       return response.data;
@@ -35,7 +35,7 @@ class AgentService {
     }
   }
 
-  async getChatHistory(sessionId: string): Promise<{ session_id: string; history: { role: string; content: string }[] }> {
+  async getChatHistory(sessionId: string): Promise<{ session_id: string; history: { role: string; content: string }[]; source: string }> {
     try {
       const response = await axios.get(`${this.baseUrl}/chat/messages`, { params: { session_id: sessionId } });
       return response.data;
