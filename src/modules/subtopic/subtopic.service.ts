@@ -1,26 +1,33 @@
 import { SubtopicRepository } from "./subtopic.repository";
 import { Subtopic } from "./subtopic.entity";
+import { TopicService } from "../topic/topic.service";
+import { CourseService } from "../course/course.service";
+import { User } from "../user/user.entity";
 import { Topic } from "../topic/topic.entity";
 import axios from "axios";
 
 export class SubtopicService {
   private static instance: SubtopicService;
   private subtopicRepo: SubtopicRepository;
+  private topicService: TopicService;
 
-  private constructor(subtopicRepo: SubtopicRepository) {
+  private constructor(subtopicRepo: SubtopicRepository, topicService: TopicService) {
     this.subtopicRepo = subtopicRepo;
+    this.topicService = topicService;
   }
 
   static getInstance(): SubtopicService {
     if (!SubtopicService.instance) {
-      SubtopicService.instance = new SubtopicService(SubtopicRepository.getInstance());
+      SubtopicService.instance = new SubtopicService(
+        SubtopicRepository.getInstance(),
+        TopicService.getInstance()
+      );
     }
     return SubtopicService.instance;
   }
 
   async generateSubtopicsForTopics(topics: Topic[]): Promise<void> {
     try {
-      // 1️⃣ Извличаме подтеми от /subtopics/extract
       const topicNames = topics.map(topic => topic.name);
       const subtopicRes = await axios.post("https://agent.exodiafmi.com/subtopics/extract", {
         topics: topicNames,
@@ -30,10 +37,8 @@ export class SubtopicService {
         throw new Error("Invalid response from subtopic extraction service");
       }
 
-      // Съхраняваме Subtopic обектите временно в памет
       const subtopicsInMemory: Subtopic[] = [];
 
-      // 2️⃣ Обхождаме резултата и свързваме подтемите с темите
       subtopicRes.data.data.forEach((topicData: any) => {
         const matchingTopic = topics.find(t => t.name === topicData.topic);
         if (!matchingTopic) return;
@@ -44,10 +49,9 @@ export class SubtopicService {
         });
       });
 
-      if (!subtopicsInMemory.length) return; // Ако няма подтеми, излизаме
+      if (!subtopicsInMemory.length) return;
 
-      // 3️⃣ Разделяме заявките на малки групи (batch processing)
-      const batchSize = 5; // Изпращаме само 5 подтеми наведнъж
+      const batchSize = 5;
       const dataToExplain: { topic: string; subtopics: string[] }[] = [];
 
       topics.forEach(t => {
@@ -60,7 +64,6 @@ export class SubtopicService {
         }
       });
 
-      // 4️⃣ Извикваме API-то за обяснения с изчакване между заявките
       for (let i = 0; i < dataToExplain.length; i += batchSize) {
         const batch = dataToExplain.slice(i, i + batchSize);
         console.log(`Processing batch ${i / batchSize + 1}/${Math.ceil(dataToExplain.length / batchSize)}`);
@@ -74,22 +77,19 @@ export class SubtopicService {
             throw new Error("Invalid response from explanations service");
           }
 
-          // Свързваме обясненията с подтемите
           explResponse.data.explanations.forEach((item: any) => {
             const subtopic = subtopicsInMemory.find(st => st.topic.name === item.topic && st.name === item.subtopic);
             if (subtopic) {
-              subtopic.text = item.explanation.replace(/\x00/g, ""); // Премахва null байтове
+              subtopic.text = item.explanation.replace(/\x00/g, "");
             }
           });
         } catch (error) {
           console.error("Error in batch processing:", error);
         }
 
-        // Изчакване, за да не спамим API-то (throttling)
-        await new Promise(res => setTimeout(res, 1000)); // 1 секунда пауза
+        await new Promise(res => setTimeout(res, 1000));
       }
 
-      // 5️⃣ Извикваме API-то за векторизация, за да попълним embedding
       const vectorizePayload = subtopicsInMemory.map((st, index) => ({
         id: index.toString(),
         text: st.text || "",
@@ -102,7 +102,6 @@ export class SubtopicService {
           throw new Error("Invalid response from vectorize service");
         }
 
-        // Свързваме embedding към подтемите
         const embeddingsByIndex: Record<string, number[]> = {};
         vectResponse.data.results.forEach((res: any) => {
           embeddingsByIndex[res.id] = res.embedding;
@@ -118,14 +117,12 @@ export class SubtopicService {
         console.error("Error in embedding generation:", error);
       }
 
-      // 6️⃣ Записваме подтемите в базата на партиди (bulk insert)
-      const saveBatchSize = 5; // Намаляваме броя на записите в една партида
+      const saveBatchSize = 5;
 
       for (let i = 0; i < subtopicsInMemory.length; i += saveBatchSize) {
         const batch = subtopicsInMemory.slice(i, i + saveBatchSize);
-        await this.subtopicRepo.createSubtopics(batch); // Ползваме bulk insert
+        await this.subtopicRepo.createSubtopics(batch);
 
-        // Изчакване между партидите, за да не натоварваме сървъра
         await new Promise(res => setTimeout(res, 1000));
       }
 
@@ -137,7 +134,21 @@ export class SubtopicService {
     }
   }
 
+  async getSubtopicsByTopicAndCourse(topicId: number, courseId: number) {
+    return this.subtopicRepo.findByTopicAndCourse(topicId, courseId);
+  }
 
+  async getSubtopicsByTopicAndCourseIfOwner(topicId: number, courseId: number, user: User) {
+    const course = await CourseService.getInstance().getCourseById(courseId);
 
+    if (!course) {
+      throw new Error(`Course with ID ${courseId} not found`);
+    }
 
+    if (course.owner.id !== user.id) {
+      throw new Error("You are not the owner of this course");
+    }
+
+    return this.subtopicRepo.findByTopicAndCourse(topicId, courseId);
+  }
 }

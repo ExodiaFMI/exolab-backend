@@ -32,6 +32,15 @@ export class SubtopicRepository {
     });
   }
 
+  async findByTopicAndCourse(topicId: number, courseId: number): Promise<Subtopic[]> {
+    return this.repo.createQueryBuilder("subtopic")
+      .leftJoinAndSelect("subtopic.topic", "topic")
+      .leftJoinAndSelect("topic.course", "course")
+      .where("topic.id = :topicId", { topicId })
+      .andWhere("course.id = :courseId", { courseId })
+      .getMany();
+  }
+
   async createSubtopic(subtopicData: Partial<Subtopic>): Promise<Subtopic> {
     const subtopic = this.repo.create(subtopicData);
     return this.repo.save(subtopic);
@@ -59,8 +68,6 @@ export class SubtopicRepository {
       await queryRunner.release();
     }
   }
-
-
 
   async deleteSubtopic(id: number): Promise<void> {
     await this.repo.delete(id);

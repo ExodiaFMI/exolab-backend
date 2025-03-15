@@ -3,7 +3,7 @@ import { Topic } from './topic.entity';
 import { Course } from '../course/course.entity';
 import { CourseService } from '../course/course.service';
 import { User } from '../user/user.entity';
-import { SubtopicService } from '../subtopics/subtopic.service';
+import { SubtopicService } from '../subtopic/subtopic.service';
 import axios from 'axios';
 
 export class TopicService {
