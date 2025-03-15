@@ -111,7 +111,26 @@ export function setupSwagger(app: Express) {
               }
             }
           }
+        },
+        Resource: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            source_url: { type: 'string', format: 'uri' },
+            type: { 
+              type: 'string', 
+              enum: ['VIDEO', 'ARTICLE', 'BOOK', 'DOCUMENT', 'OTHER']
+            },
+            subtopic: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' }
+              }
+            }
+          }
         }
+        
         
       }
     },
