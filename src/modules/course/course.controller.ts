@@ -2,7 +2,8 @@ import { JsonController, Get, Post, Delete, Param, Body, UseBefore } from 'routi
 import { OpenAPI } from 'routing-controllers-openapi';
 import { CourseService } from './course.service';
 import { authMiddleware, adminMiddleware } from '../../middlewares/auth';
-import { Course } from './course.entity';
+import { CreateCourseDto } from './course.dto';
+import { CourseResponseDto } from './course.dto';
 
 @JsonController('/courses')
 @OpenAPI({ tags: ['Courses'] })
@@ -12,13 +13,15 @@ export class CourseController {
   @Get('/')
   @UseBefore(authMiddleware)
   async getAllCourses() {
-    return this.courseService.getAllCourses();
+    const courses = await this.courseService.getAllCourses();
+    return courses.map(course => new CourseResponseDto(course));
   }
 
   @Get('/:id')
   @UseBefore(authMiddleware)
   async getCourseById(@Param('id') id: number) {
-    return this.courseService.getCourseById(id);
+    const course = await this.courseService.getCourseById(id);
+    return course ? new CourseResponseDto(course) : null;
   }
 
   @Get('/user/:userId')
@@ -29,9 +32,10 @@ export class CourseController {
 
   @Post('/')
   @UseBefore(authMiddleware)
-  async createCourse(@Body() courseData: Partial<Course>) {
+  async createCourse(@Body() courseData: CreateCourseDto) {
     return this.courseService.createCourse(courseData);
   }
+  
 
   @Delete('/:id')
   @UseBefore(authMiddleware, adminMiddleware)
