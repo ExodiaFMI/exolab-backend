@@ -3,6 +3,7 @@ import { Course } from './course.entity';
 import { CreateCourseDto } from './course.dto';
 import { UserService } from '../user/user.service';
 import { SubjectRepository } from '../subject/subject.repository';
+import { TopicService } from '../topic/topic.service';
 
 export class CourseService {
   private static instance: CourseService;
@@ -56,8 +57,10 @@ export class CourseService {
         owner
     });
 
+    await TopicService.getInstance().generateTopicsForCourse(newCourse);
+
     return newCourse;
-  }
+}
 
   async deleteCourse(id: number): Promise<void> {
     await this.courseRepo.deleteCourse(id);
