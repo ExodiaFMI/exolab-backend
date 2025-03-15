@@ -13,6 +13,7 @@ import { SubtopicController } from './modules/subtopic/subtopic.controller';
 import { SubjectController } from './modules/subject/subject.controller';
 import { AgentController } from './modules/agent/agent.controller';
 import { BiolinksController } from './modules/services/biolink.controller';
+import { ResourceController } from './modules/resource/resource.controller';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ useExpressServer(app, {
     SubjectController,
     AgentController,
     BiolinksController,
+    ResourceController
   ],
 });
 

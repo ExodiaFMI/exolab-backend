@@ -6,7 +6,7 @@ import AgentService from "./agent.service";
 @OpenAPI({ tags: ["Agent"] })
 export class AgentController {
   private agentService = AgentService;
-  
+
   @Post("/chat/start")
   @OpenAPI({
     summary: "Start a new chat session",
@@ -187,9 +187,10 @@ export class AgentController {
           schema: {
             type: "object",
             properties: {
-              prompt: { type: "string" }
+              prompt: { type: "string" },
+              subtopicId: { type: "number" }
             },
-            required: ["prompt"]
+            required: ["prompt", "subtopicId"]
           }
         }
       }
@@ -210,8 +211,8 @@ export class AgentController {
       }
     }
   })
-  async generateImage(@Body() body: { prompt: string }) {
-    return this.agentService.generateImage(body.prompt);
+  async generateImage(@Body() body: { prompt: string; subtopicId: number }) {
+    return this.agentService.generateImage(body.prompt, body.subtopicId);
   }
 
   @Post("/image/search")
@@ -262,12 +263,13 @@ export class AgentController {
             type: "object",
             properties: {
               prompt: { type: "string" },
+              subtopicId: { type: "number" },
               model: { type: "string", default: "ray-2" },
               resolution: { type: "string", default: "720p" },
               duration: { type: "string", default: "5s" },
               loop: { type: "boolean", default: false }
             },
-            required: ["prompt"]
+            required: ["prompt", "subtopicId"]
           }
         }
       }
@@ -289,8 +291,8 @@ export class AgentController {
     }
   })
   async generateVideo(
-    @Body() body: { prompt: string; model?: string; resolution?: string; duration?: string; loop?: boolean }
+    @Body() body: { prompt: string; subtopicId: number; model?: string; resolution?: string; duration?: string; loop?: boolean }
   ) {
-    return this.agentService.generateVideo(body.prompt, body.model, body.resolution, body.duration, body.loop);
+    return this.agentService.generateVideo(body.prompt, body.subtopicId, body.model, body.resolution, body.duration, body.loop);
   }
 }

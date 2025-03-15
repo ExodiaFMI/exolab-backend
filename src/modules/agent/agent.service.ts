@@ -1,4 +1,6 @@
 import axios from "axios";
+import { ResourceService } from "../resource/resource.service";
+import { ResourceType } from "../../enums/resource.enum";
 
 class AgentService {
   private static instance: AgentService;
@@ -45,9 +47,18 @@ class AgentService {
     }
   }
 
-  async generateImage(prompt: string): Promise<{ image_url: string }> {
+  async generateImage(prompt: string, subtopicId: number): Promise<{ image_url: string }> {
     try {
       const response = await axios.post(`${this.baseUrl}/images/generate`, { prompt });
+      const imageUrl = response.data.image_url;
+
+      // Запазваме ресурса в базата
+      await ResourceService.getInstance().createResource({
+        source_url: imageUrl,
+        type: ResourceType.IMAGE,
+        subtopic: { id: subtopicId } as any,
+      });
+
       return response.data;
     } catch (error) {
       console.error("Error generating image:", error);
@@ -67,6 +78,7 @@ class AgentService {
 
   async generateVideo(
     prompt: string,
+    subtopicId: number,
     model: string = "ray-2",
     resolution: string = "720p",
     duration: string = "5s",
@@ -74,6 +86,15 @@ class AgentService {
   ): Promise<{ video_url: string }> {
     try {
       const response = await axios.post(`${this.baseUrl}/videos/generate`, { prompt, model, resolution, duration, loop });
+      const videoUrl = response.data.video_url;
+
+      // Запазваме ресурса в базата
+      await ResourceService.getInstance().createResource({
+        source_url: videoUrl,
+        type: ResourceType.VIDEO,
+        subtopic: { id: subtopicId } as any,
+      });
+
       return response.data;
     } catch (error) {
       console.error("Error generating video:", error);
