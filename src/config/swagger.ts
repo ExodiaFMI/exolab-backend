@@ -77,6 +77,21 @@ export function setupSwagger(app: Express) {
             id: { type: 'number' },
             name: { type: 'string' }
           }
+        },
+        SubtopicResponseDto: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            name: { type: 'string' },
+            text: { type: 'string' },
+            topic: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                name: { type: 'string' }
+              }
+            }
+          }
         }
       }
     },
