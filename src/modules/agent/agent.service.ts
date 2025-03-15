@@ -5,7 +5,7 @@ class AgentService {
   private readonly baseUrl: string;
 
   private constructor() {
-    this.baseUrl = "https://agent.exodiafmi.com/chat";
+    this.baseUrl = "https://agent.exodiafmi.com";
   }
 
   static getInstance(): AgentService {
@@ -17,7 +17,7 @@ class AgentService {
 
   async startChat(message: string): Promise<{ session_id: string; reply: string; history: string[] }> {
     try {
-      const response = await axios.post(`${this.baseUrl}/create`, { message });
+      const response = await axios.post(`${this.baseUrl}/chat/create`, { message });
       return response.data;
     } catch (error) {
       console.error("Error starting chat:", error);
@@ -27,7 +27,7 @@ class AgentService {
 
   async sendMessage(sessionId: string, message: string): Promise<{ session_id: string; reply: string; history: string[] }> {
     try {
-      const response = await axios.post(`${this.baseUrl}/message`, { session_id: sessionId, message });
+      const response = await axios.post(`${this.baseUrl}/chat/message`, { session_id: sessionId, message });
       return response.data;
     } catch (error) {
       console.error("Error sending message:", error);
@@ -37,11 +37,31 @@ class AgentService {
 
   async getChatHistory(sessionId: string): Promise<{ session_id: string; history: { role: string; content: string }[] }> {
     try {
-      const response = await axios.get(`${this.baseUrl}/messages`, { params: { session_id: sessionId } });
+      const response = await axios.get(`${this.baseUrl}/chat/messages`, { params: { session_id: sessionId } });
       return response.data;
     } catch (error) {
       console.error("Error retrieving chat history:", error);
       throw new Error("Failed to retrieve chat history");
+    }
+  }
+
+  async generateImage(prompt: string): Promise<{ image_url: string }> {
+    try {
+      const response = await axios.post(`${this.baseUrl}/images/generate`, { prompt });
+      return response.data;
+    } catch (error) {
+      console.error("Error generating image:", error);
+      throw new Error("Failed to generate image");
+    }
+  }
+
+  async searchImage(prompt: string): Promise<{ image_url: string }> {
+    try {
+      const response = await axios.post(`${this.baseUrl}/image/search`, { prompt });
+      return response.data;
+    } catch (error) {
+      console.error("Error searching image:", error);
+      throw new Error("Failed to search image");
     }
   }
 }

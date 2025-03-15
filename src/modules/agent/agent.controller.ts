@@ -127,4 +127,78 @@ export class AgentController {
   async getChatHistory(@QueryParam("session_id") sessionId: string) {
     return this.agentService.getChatHistory(sessionId);
   }
+
+  @Post("/image/generate")
+  @OpenAPI({
+    summary: "Generate an image",
+    description: "Generates an image based on the given prompt.",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              prompt: { type: "string" }
+            },
+            required: ["prompt"]
+          }
+        }
+      }
+    },
+    responses: {
+      "200": {
+        description: "Generated image",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                image_url: { type: "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  async generateImage(@Body() body: { prompt: string }) {
+    return this.agentService.generateImage(body.prompt);
+  }
+
+  @Post("/image/search")
+  @OpenAPI({
+    summary: "Search for an image",
+    description: "Searches for an image based on the given prompt.",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              prompt: { type: "string" }
+            },
+            required: ["prompt"]
+          }
+        }
+      }
+    },
+    responses: {
+      "200": {
+        description: "Found image",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                image_url: { type: "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  async searchImage(@Body() body: { prompt: string }) {
+    return this.agentService.searchImage(body.prompt);
+  }
 }
