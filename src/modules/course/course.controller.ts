@@ -21,6 +21,12 @@ export class CourseController {
     return this.courseService.getCourseById(id);
   }
 
+  @Get('/user/:userId')
+  @UseBefore(authMiddleware)
+  async getCoursesByUser(@Param('userId') userId: number) {
+    return this.courseService.getCoursesByUserId(userId);
+  }
+
   @Post('/')
   @UseBefore(authMiddleware)
   async createCourse(@Body() courseData: Partial<Course>) {

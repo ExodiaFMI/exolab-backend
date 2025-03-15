@@ -18,11 +18,15 @@ export class CourseRepository {
   }
 
   async findAll(): Promise<Course[]> {
-    return this.repo.find({ relations: ['subject'] });
+    return this.repo.find({ relations: ['subject', 'owner'] });
   }
 
   async findById(id: number): Promise<Course | null> {
-    return this.repo.findOne({ where: { id }, relations: ['subject'] });
+    return this.repo.findOne({ where: { id }, relations: ['subject', 'owner'] });
+  }
+
+  async findByUserId(userId: number): Promise<Course[]> {
+    return this.repo.find({ where: { owner: { id: userId } }, relations: ['subject', 'owner'] });
   }
 
   async createCourse(courseData: Partial<Course>): Promise<Course> {

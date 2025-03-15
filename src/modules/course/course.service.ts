@@ -24,6 +24,10 @@ export class CourseService {
     return this.courseRepo.findById(id);
   }
 
+  async getCoursesByUserId(userId: number): Promise<Course[]> {
+    return this.courseRepo.findByUserId(userId);
+  }
+
   async createCourse(courseData: Partial<Course>): Promise<Course> {
     return this.courseRepo.createCourse(courseData);
   }
