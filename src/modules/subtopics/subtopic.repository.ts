@@ -37,6 +37,31 @@ export class SubtopicRepository {
     return this.repo.save(subtopic);
   }
 
+  async createSubtopics(subtopics: Subtopic[]): Promise<void> {
+    if (!subtopics.length) return;
+
+    const queryRunner = this.repo.manager.connection.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      await queryRunner.manager.createQueryBuilder()
+        .insert()
+        .into(Subtopic)
+        .values(subtopics)
+        .execute();
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      console.error("Error in bulk insert for subtopics:", error);
+      await queryRunner.rollbackTransaction();
+      throw new Error("Failed to save subtopics in bulk");
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+
+
   async deleteSubtopic(id: number): Promise<void> {
     await this.repo.delete(id);
   }
