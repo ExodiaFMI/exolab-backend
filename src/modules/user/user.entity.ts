@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BaseEntity } from 'typeorm';
 
-@Entity()
+@Entity("users")
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -14,14 +14,10 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
   constructor(name: string, email: string, password: string) {
     super();
     this.name = name;
     this.email = email;
     this.password = password;
-    this.createdAt = new Date();
   }
 }
