@@ -47,6 +47,7 @@ export class SubtopicRepository {
   }
 
   async createSubtopics(subtopics: Subtopic[]): Promise<void> {
+    console.log("Subtopics to save:", subtopics.length);
     if (!subtopics.length) return;
 
     const queryRunner = this.repo.manager.connection.createQueryRunner();
