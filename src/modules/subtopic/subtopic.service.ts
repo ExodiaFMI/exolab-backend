@@ -33,8 +33,10 @@ export class SubtopicService {
   async generateSubtopicsForTopics(topics: Topic[]): Promise<void> {
     try {
       const topicNames = topics.map(topic => topic.name);
+      const topicResources = topics.map(topic => topic.resources || []).flat();
       const subtopicRes = await axios.post("https://agent.exodiafmi.com/subtopics/extract", {
         topics: topicNames,
+        resources: topicResources,
       });
   
       if (!subtopicRes.data || !subtopicRes.data.data) {
@@ -77,6 +79,7 @@ export class SubtopicService {
         console.log(`Processing batch ${index + 1}/${batches.length}`);
         return axios.post("https://agent.exodiafmi.com/explanations/generate", {
           data: batch,
+          resources: topicResources,
         })
           .then(explResponse => {
             if (!explResponse.data || !explResponse.data.explanations) {
