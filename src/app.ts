@@ -14,6 +14,7 @@ import { SubjectController } from './modules/subject/subject.controller';
 import { AgentController } from './modules/agent/agent.controller';
 import { BiolinksController } from './modules/services/biolink.controller';
 import { ResourceController } from './modules/resource/resource.controller';
+import { TestManagerController } from './modules/test/testManager.controller';
 
 dotenv.config();
 
@@ -27,7 +28,7 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 
 app.use(cors({
-  origin: '*', 
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   maxAge: 86400,
@@ -45,7 +46,8 @@ useExpressServer(app, {
     SubjectController,
     AgentController,
     BiolinksController,
-    ResourceController
+    ResourceController,
+    TestManagerController
   ],
 });
 
