@@ -17,7 +17,8 @@ export class AgentController {
           schema: {
             type: "object",
             properties: {
-              message: { type: "string" }
+              message: { type: "string" },
+              subtopic_id: { type: "string" } // Ново поле
             },
             required: ["message"]
           }
@@ -58,8 +59,8 @@ export class AgentController {
       }
     }
   })
-  async startChat(@Body() body: { message: string }) {
-    return this.agentService.startChat(body.message);
+  async startChat(@Body() body: { message: string; subtopic_id?: string }) {
+    return this.agentService.startChat(body.message, body.subtopic_id);
   }
 
   @Post("/chat/message")
@@ -73,7 +74,8 @@ export class AgentController {
             type: "object",
             properties: {
               session_id: { type: "string" },
-              message: { type: "string" }
+              message: { type: "string" },
+              subtopic_id: { type: "string" } // Ново поле
             },
             required: ["session_id", "message"]
           }
@@ -114,8 +116,8 @@ export class AgentController {
       }
     }
   })
-  async sendMessage(@Body() body: { session_id: string; message: string }) {
-    return this.agentService.sendMessage(body.session_id, body.message);
+  async sendMessage(@Body() body: { session_id: string; message: string; subtopic_id?: string }) {
+    return this.agentService.sendMessage(body.session_id, body.message, body.subtopic_id);
   }
 
   @Get("/chat/messages")

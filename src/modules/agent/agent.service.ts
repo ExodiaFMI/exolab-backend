@@ -17,9 +17,9 @@ class AgentService {
     return AgentService.instance;
   }
 
-  async startChat(message: string): Promise<{ session_id: string; reply: string; history: string[]; source: string }> {
+  async startChat(message: string, subtopic_id?: string): Promise<{ session_id: string; reply: string; history: string[]; source: string }> {
     try {
-      const response = await axios.post(`${this.baseUrl}/chat/create`, { message });
+      const response = await axios.post(`${this.baseUrl}/chat/create`, { message, subtopic_id });
       return response.data;
     } catch (error) {
       console.error("Error starting chat:", error);
@@ -27,15 +27,16 @@ class AgentService {
     }
   }
 
-  async sendMessage(sessionId: string, message: string): Promise<{ session_id: string; reply: string; history: string[]; source: string }> {
+  async sendMessage(sessionId: string, message: string, subtopic_id?: string): Promise<{ session_id: string; reply: string; history: string[]; source: string }> {
     try {
-      const response = await axios.post(`${this.baseUrl}/chat/message`, { session_id: sessionId, message });
+      const response = await axios.post(`${this.baseUrl}/chat/message`, { session_id: sessionId, message, subtopic_id });
       return response.data;
     } catch (error) {
       console.error("Error sending message:", error);
       throw new Error("Failed to send message");
     }
   }
+
 
   async getChatHistory(sessionId: string): Promise<{ session_id: string; history: { role: string; content: string }[]; source: string }> {
     try {
