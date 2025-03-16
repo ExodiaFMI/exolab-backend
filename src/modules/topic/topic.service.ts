@@ -77,4 +77,10 @@ export class TopicService {
 
     return this.topicRepo.findByCourseId(courseId);
   }
+
+  async getTopicById(topicId: number): Promise<Topic | null> {
+    return this.topicRepo.findById(topicId);
+  }
+
+
 }

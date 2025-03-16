@@ -23,13 +23,6 @@ export class SubtopicService {
     return SubtopicService.instance;
   }
 
-  private getTopicService(): TopicService {
-    if (!this.topicService) {
-      this.topicService = TopicService.getInstance();
-    }
-    return this.topicService;
-  }
-
   private getCourseService(): CourseService {
     if (!this.courseService) {
       this.courseService = CourseService.getInstance();
@@ -167,5 +160,9 @@ export class SubtopicService {
     }
 
     return this.subtopicRepo.findByTopicAndCourse(topicId, courseId);
+  }
+
+  async getSubtopicById(subtopicId: number): Promise<Subtopic | null> {
+    return this.subtopicRepo.findById(subtopicId);
   }
 }
