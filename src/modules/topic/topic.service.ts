@@ -39,26 +39,36 @@ export class TopicService {
 
   async generateTopicsForCourse(course: Course): Promise<void> {
     try {
-      const response = await axios.post("https://agent.exodiafmi.com/topics/extract", {
-        content: course.testInfo
-      });
+        const response = await axios.post("https://agent.exodiafmi.com/topics/extract", {
+            content: course.testInfo
+        });
 
-      if (!response.data || !response.data.topics) {
-        throw new Error("Invalid response from topic extraction service");
-      }
+        if (!response.data || !response.data.topics) {
+            throw new Error("Invalid response from topic extraction service");
+        }
 
-      const topics = response.data.topics.map((topicName: string) => {
-        return this.topicRepo.createTopic({ name: topicName, course });
-      });
+        const description: string | undefined = response.data.description ?? undefined;
+        const resources: string[] | undefined = response.data.recourses ?? undefined;
 
-      const savedTopics = await Promise.all(topics);
+        const topics = response.data.topics.map((topicName: string) => {
+            return this.topicRepo.createTopic({
+                name: topicName,
+                course,
+                description,
+                resources
+            });
+        });
 
-      await this.getSubtopicService().generateSubtopicsForTopics(savedTopics);
+        const savedTopics = await Promise.all(topics);
+
+        await this.getSubtopicService().generateSubtopicsForTopics(savedTopics);
     } catch (error) {
-      console.error("Error generating topics:", error);
-      throw new Error("Failed to generate topics for course");
+        console.error("Error generating topics:", error);
+        throw new Error("Failed to generate topics for course");
     }
-  }
+}
+
+
 
   async getTopicsByCourseId(courseId: number): Promise<Topic[]> {
     return this.topicRepo.findByCourseId(courseId);

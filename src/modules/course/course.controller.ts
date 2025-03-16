@@ -87,7 +87,7 @@ export class CourseController {
   }
 
   @Post('/')
-  @UseBefore(authMiddleware)
+  //@UseBefore(authMiddleware)
   @OpenAPI({
     summary: 'Create a new course',
     description: 'Creates a new course and returns the created entity.',
