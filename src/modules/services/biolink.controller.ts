@@ -39,8 +39,8 @@ export class BiolinksController {
                     type: "object",
                     properties: {
                       name: { type: "string" },
-                      link: { type: "string" },
-                      id: { type: "string" }
+                      href: { type: "string" },
+                      similiarity: { type: "string" }
                     }
                   }
                 }
